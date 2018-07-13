@@ -12,6 +12,7 @@
 		281B34F420F8743D00FFE53E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 281B34F220F8743D00FFE53E /* Main.storyboard */; };
 		281B34F620F8743F00FFE53E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 281B34F520F8743F00FFE53E /* Assets.xcassets */; };
 		281B34F920F8743F00FFE53E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 281B34F720F8743F00FFE53E /* LaunchScreen.storyboard */; };
+		281B350120F8747900FFE53E /* ImageCropperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281B350020F8747900FFE53E /* ImageCropperViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		281B34F520F8743F00FFE53E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		281B34F820F8743F00FFE53E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		281B34FA20F8743F00FFE53E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		281B350020F8747900FFE53E /* ImageCropperViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCropperViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +62,7 @@
 				281B34F520F8743F00FFE53E /* Assets.xcassets */,
 				281B34F720F8743F00FFE53E /* LaunchScreen.storyboard */,
 				281B34FA20F8743F00FFE53E /* Info.plist */,
+				281B350020F8747900FFE53E /* ImageCropperViewController.swift */,
 			);
 			path = ImageCropperWithAutoLayoutConstraints;
 			sourceTree = "<group>";
@@ -137,6 +140,7 @@
 			files = (
 				281B34F120F8743D00FFE53E /* ViewController.swift in Sources */,
 				281B34EF20F8743C00FFE53E /* AppDelegate.swift in Sources */,
+				281B350120F8747900FFE53E /* ImageCropperViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

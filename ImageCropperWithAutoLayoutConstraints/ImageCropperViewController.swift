@@ -13,57 +13,67 @@
  */
 
 import UIKit
+
+// MARK: Protocol
+// To be implemented in calling view controller - what happens after cropping finished
+
 protocol ImageCropperViewControllerDelegate {
     func imageDidFinishCropping(imageCropperViewController: ImageCropperViewController)
 }
 
-class ImageCropperViewController: UIViewController {
+// MARK: Class
 
-    var xOffset: CGFloat
-    var yOffset: CGFloat
+class ImageCropperViewController: UIViewController {
     
+    // MARK: Properties
+
+    //offsets for centering image
+    var xOffset: CGFloat = 0
+    var yOffset: CGFloat = 0
+    
+    //constraints for positioning imageView after zoom
     var imageViewTopAnchorConstraint: NSLayoutConstraint?
     var imageViewLeadingAnchorConstraint: NSLayoutConstraint?
     
+    // delegate - the calling view controller
     var delegate: ImageCropperViewControllerDelegate?
     
+    //variable to store cropped image
     var croppedImage: UIImage!
     
+    //navigaton bar
     let navigationBar : UINavigationBar = {
         let nb = UINavigationBar()
         let nitem = UINavigationItem(title: "Crop")
         nb.backgroundColor = UIColor(red: 0.969, green: 0.969, blue: 0.969, alpha: 1.0)
         nitem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(cropImageAndExit))
-        
         nb.items = [nitem]
-        
         nb.translatesAutoresizingMaskIntoConstraints = false
         return nb
     }()
     
+    //imageView containing image to be cropped - inside scrollView
     let imageView: UIImageView = {
         let iv = UIImageView()
-        //let iv = UIImageView(image: #imageLiteral(resourceName: "cliffs"))
-        
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }()
     
+    //scrollView for zooming and panning
     let scrollView: UIScrollView = {
         let sv = UIScrollView()
-        //sv.layer.borderColor = UIColor.white.cgColor
         sv.backgroundColor = UIColor.white
-        //sv.layer.borderWidth = 1
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
     
     
+    // MARK: Initializers
     
+    //intialize with image to be cropped
     init(image: UIImage) {
+        //set image in imageView
         self.imageView.image = image
-        self.xOffset = 0
-        self.yOffset = 0
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -72,26 +82,26 @@ class ImageCropperViewController: UIViewController {
     }
     
     
-    
+    // MARK: Lifecycle
     
     override func viewDidLoad() {
-        print("In View Did Load \(navigationBar.tintColor)")
         
         super.viewDidLoad()
         
-        
-        
-        //scrollview delegate
+        //assign delegates
         scrollView.delegate = self
         navigationBar.delegate = self
         
         //view background
         self.view.backgroundColor = UIColor(red: 0.969, green: 0.969, blue: 0.969, alpha: 1.0)
-        //self.view.alpha = 0.9
         
+        // add subviews
         self.view.addSubview(scrollView)
         self.view.addSubview(navigationBar)
-        scrollView.addSubview(imageView)
+        scrollView.addSubview(imageView) //imaveView in scrollView
+        
+        
+        //layout constraints
         
         navigationBar.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
         navigationBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
@@ -102,7 +112,9 @@ class ImageCropperViewController: UIViewController {
         scrollView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 10).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -10).isActive = true
         scrollView.heightAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
-                   
+        
+        //save imageView Constraints for later use
+        
         imageViewLeadingAnchorConstraint = imageView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor)
         imageViewLeadingAnchorConstraint?.isActive = true
         
@@ -113,25 +125,18 @@ class ImageCropperViewController: UIViewController {
         
         imageView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
         
-        
-        
-        
     }
     
     override func viewWillLayoutSubviews() {
-        
         super.viewWillLayoutSubviews()
-        centerSrcollViewContents()
-        print("LAYING OUT SUBVIEWS")
+        //center imageView in scrollView
+        centerScrollViewContents()
     }
     
-    
-    
     override func viewDidLayoutSubviews() {
+         super.viewDidLayoutSubviews()
         
-        print("In View Did Layout Subview")
-        
-        /********************/
+        //set scrollView border
         let scrollViewBorder = CAShapeLayer()
         scrollViewBorder.frame = scrollView.frame
         scrollViewBorder.lineWidth = 1
@@ -141,23 +146,20 @@ class ImageCropperViewController: UIViewController {
         scrollViewBorder.path = UIBezierPath(rect: scrollView.bounds).cgPath
         view.layer.addSublayer(scrollViewBorder)
         
-        /********************/
-        
-        super.viewDidLayoutSubviews()
+        //update zoom scale for scrollView
         updateMinZoomScaleForSize(scrollView.frame.size)
     }
     
     fileprivate func updateMinZoomScaleForSize(_ size: CGSize) {
-        print("In updateMinZoomScaleForSize")
-        
-        
         let widthScale = size.width / (imageView.image?.size.width)!
         let heightScale = size.height / (imageView.image?.size.height)!
         let minScale = min(widthScale, heightScale)
         
+        //minimum scale is scale that fits image in scrollView
         scrollView.minimumZoomScale = minScale
-        scrollView.zoomScale = minScale
         
+        //current zoomScale
+        scrollView.zoomScale = minScale
     }
     
     override func didReceiveMemoryWarning() {
@@ -165,61 +167,61 @@ class ImageCropperViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    //update view constraints - for imageView centering after zoom
     override func updateViewConstraints() {
         imageViewTopAnchorConstraint?.constant = yOffset
         imageViewLeadingAnchorConstraint?.constant = xOffset
-        //        imageView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: -yOffset)
-        //        imageView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: -xOffset)
         super.updateViewConstraints()
-        print("UPDATING VIE CONSTRAINTS")
-        
-        //        imageView.frame.origin.y = yOffset
-        //
-        //        imageView.frame.origin.x = xOffset
     }
     
+    // MARK: Action
+    
+    //crop image action
     @objc func cropImageAndExit(){
-        print("dismissing")
-        
-        /************/
-        
-        
+        //save image in scroll view area
         UIGraphicsBeginImageContextWithOptions(scrollView.frame.size, false, UIScreen.main.scale)
         let offset = scrollView.contentOffset
-        print("offset: \(offset)")
         UIGraphicsGetCurrentContext()?.translateBy(x: -offset.x, y: -offset.y)
         scrollView.layer.render(in: UIGraphicsGetCurrentContext()!)
         croppedImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        imageView.image = croppedImage
+        //imageView.image = croppedImage
         
-        /***************/
+        //call imageDidFinishCropping in delegate, i.e. calling view controller
         delegate?.imageDidFinishCropping(imageCropperViewController: self)
+        
+        //dismiss this view
         dismiss(animated: true, completion: nil)
     }
 
 }
 
+// MARK: Scroll View Delegate
+
 extension ImageCropperViewController: UIScrollViewDelegate {
     
+    // during zooming - view to return
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
     }
     
-    func centerSrcollViewContents(){
-        yOffset = max(0, (scrollView.bounds.size.height - imageView.frame.height) / 2)
-        
-        xOffset = max(0, (scrollView.bounds.size.width - imageView.frame.width) / 2)
-        updateViewConstraints()
+    // after zooming - task to perform
+    // in this case, center imageView
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        centerScrollViewContents()
     }
     
-    //
-    func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        centerSrcollViewContents()
+    //center imageView in scrollView
+    fileprivate func centerScrollViewContents(){
+        yOffset = max(0, (scrollView.bounds.size.height - imageView.frame.height) / 2)
+        xOffset = max(0, (scrollView.bounds.size.width - imageView.frame.width) / 2)
+        updateViewConstraints() //call updateViewConstraints
     }
     
 }
+
+// MARK: Navigation Bar Delegate
 
 extension ImageCropperViewController: UINavigationBarDelegate {
     

@@ -17,6 +17,14 @@ class ViewController: UIViewController {
     
     // MARK: Properties
     
+    //label - add image
+    let label: UILabel = {
+        let lbl = UILabel()
+        lbl.text  = "Add Image"
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        return lbl
+    }()
+    
     //imagePicker
     let picker = UIImagePickerController()
     
@@ -50,6 +58,7 @@ class ViewController: UIViewController {
         
         //add views
         view.addSubview(imageView)
+        view.addSubview(label)
         imageView.addGestureRecognizer(tapGestureRecognizer)
         
         //view layout constraints
@@ -57,6 +66,9 @@ class ViewController: UIViewController {
         imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
         imageView.widthAnchor.constraint(equalToConstant: 200).isActive  = true
         imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor).isActive = true
+        
+        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
         
     }
     
@@ -110,11 +122,15 @@ extension ViewController : UIImagePickerControllerDelegate, UINavigationControll
     }
     
     // image finished cropping, update image view
-    // implemented by this view controller as required by ImageCropperViewControllerDelegate
     func imageDidFinishCropping(imageCropperViewController: ImageCropperViewController) {
-        print("HELLO")
+        //for debugging - print cropped image size
         print("Cropped Image  size: \(imageCropperViewController.croppedImage.size)")
+        
+        //update imageView
         imageView.image = imageCropperViewController.croppedImage
+        
+        //hide label
+        label.isHidden = true
     }
 
 
